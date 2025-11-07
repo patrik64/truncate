@@ -1,57 +1,55 @@
-# Heading
+# Maintaining Operational State (BROKEN REPRO)
 
-## 1. Numbering + Heading
-Lorem Ipsum
+## Setup
+This file intentionally references images that can never resolve to force a hard fetch failure.
 
-## 2. Numbering + Heading
-Lorem Ipsum
+## Broken image (external, Markdown)
+![Broken-External-MD](https://definitely-does-not-exist.invalid/abc123.png)
 
-## 3. Numbering + Heading
-Lorem Ipsum
+## Broken image (external, HTML)
+<img src="https://definitely-does-not-exist.invalid/abc123.png" alt="Broken-External-HTML" />
 
-### 3.1 Numbering + Deeper Heading
-Lorem Ipsum
-![Missing Diagram](./images/does-not-exist.png){ height=300 }
+## Broken image (relative, Markdown)
+![Broken-Relative-MD](./__surely_missing__/nope.png)
 
-## 4. Long List (structure/length trigger)
-- Item 01: Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-- Item 02: Aenean commodo ligula eget dolor. Aenean massa.
-- Item 03: Cum sociis natoque penatibus et magnis dis parturient montes.
-- Item 04: Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
-- Item 05: Nulla consequat massa quis enim.
-- Item 06: Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu.
-- Item 07: In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.
-- Item 08: Nullam dictum felis eu pede mollis pretium.
-- Item 09: Integer tincidunt. Cras dapibus.
-- Item 10: Vivamus elementum semper nisi.
-- Item 11: Aenean vulputate eleifend tellus.
-- Item 12: Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim.
+### Post-image validation section
+If you can read this in **GitHub** but it is **missing** in **Ketryx**, the parser truncated after a failed attachment fetch.
 
-## 5. Table (parser boundary trigger)
-| State            | App Display           | Notes                                 |
-|------------------|-----------------------|----------------------------------------|
-| NotPaired        | Pair New              | Initial onboarding                      |
-| Pairing          | Searching to pair     | BLE discovery                           |
-| InSession        | Sensor Warmup         | Requires timers                         |
-| SessionActive    | Readings              | Normal operation                        |
-| SessionExpired   | Expired               | Block UX until re-pair                  |
+#### Extra content below to rule out length/format edge cases
+- Bullet A
+- Bullet B
 
-## 6. Code Fence (another boundary trigger)
 ```json
-{
-  "component": "sensor-comm",
-  "txState": ["NotPaired", "Pairing", "InSession", "SessionActive", "SessionExpired"],
-  "notes": "Large fenced blocks sometimes expose truncation when combined with images and tables."
-}
+{"note":"A fenced code block placed after the images; if this doesn't render in Ketryx, truncation occurred above."}
 
-## 7. Numbering + Heading
-Lorem Ipsum
+| Col A | Col B |
+| ----: | :---- |
+|     1 | ok    |
+|     2 | ok    |
 
-## 8. Numbering + Heading
-Lorem Ipsum
 
-## 9. Numbering + Heading
-Lorem Ipsum
+3) **Commit directly** to the same branch Ketryx analyzes.
 
-## 10. Numbering + Heading
-Lorem Ipsum
+4) In **Ketryx → Settings → Repositories**, confirm:
+   - The **glob** covers this path (it will if your previous file synced).
+   - The feature flag **`enableGitBasedItemsAttachments`** is enabled for this environment.
+
+5) **Trigger a re-parse** (any one of these works):
+   - Click **Save changes** on the repository settings (even without edits), or
+   - Make a tiny change (add a space) to the file and commit again.
+
+6) Open the new record for `Body-broken.md` in Ketryx.
+
+### Expected
+- GitHub shows the **entire** file.
+- **Ketryx** renders **until one of the broken images**, then **“Post-image validation section”** (and content below it) does **not** appear.
+
+---
+
+## If it still doesn’t truncate
+Some environments now continue rendering after failures. Two escalations:
+
+- **Move the first broken image to the very top** (line 1) to ensure it’s hit before anything else.
+- **Use an absurd relative escape** that cannot map inside the repo:
+  ```markdown
+  ![Absurd](../../../../../../../../__missing__/nope.png)
