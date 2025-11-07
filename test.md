@@ -11,6 +11,7 @@ Lorem Ipsum
 
 ### 3.1 Numbering + Deeper Heading
 Lorem Ipsum
+![Missing Diagram](./images/does-not-exist.png){ height=300 }
 
 ## 4. Long List (structure/length trigger)
 - Item 01: Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
